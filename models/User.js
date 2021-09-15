@@ -1,9 +1,9 @@
-import { Schema, model } from "mongoose";
+const mongoose = require("mongoose");
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import validator from "validator";
 
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -118,6 +118,6 @@ userSchema.methods.createResetCode = function () {
   return resetCode;
 };
 
-const User = model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

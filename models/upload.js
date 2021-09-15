@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+const mongoose = require("mongoose");
 const slugify = require("slugify");
 
-const uploadSchema = new Schema({
+const uploadSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "Please provide a title!"],
@@ -22,6 +22,6 @@ uploadSchema.pre("save", function (next) {
   next();
 });
 
-const Upload = model("Upload", uploadSchema);
+const Upload = mongoose.model("Upload", uploadSchema);
 
 module.exports = Upload;
