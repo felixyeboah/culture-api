@@ -7,6 +7,6 @@ const slidesSchema = new mongoose.Schema({
   },
 });
 
-const Slides = mongoose.model("Upload", slidesSchema);
+const Slides = mongoose.model("Slides", slidesSchema);
 
 module.exports = Slides;
