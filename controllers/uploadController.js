@@ -54,7 +54,7 @@ exports.uploads = async (req, res) => {
       images: publicId,
     });
 
-    res.status(204).json(uploadResponse);
+    res.status(201).json(uploadResponse);
   } catch (err) {
     res.status(500).json({
       message: err.message,

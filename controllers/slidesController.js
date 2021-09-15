@@ -39,7 +39,7 @@ exports.uploadSlides = async (req, res) => {
       images: publicId,
     });
 
-    res.status(204).json(uploadResponse);
+    res.status(201).json(uploadResponse);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -54,7 +54,7 @@ exports.deleteSlide = async (req, res) => {
     return res.status(400).json({ message: "No image found with this ID" });
   }
 
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
     data: null,
   });
