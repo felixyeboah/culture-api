@@ -1,5 +1,13 @@
-const cloudinary = require("../utils/cloudinary");
+const cloudinary = require("cloudinary").v2;
+
 const Slides = require("../models/Slides");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+  secure: true,
+});
 
 exports.getSlides = async (req, res) => {
   const allSlides = await Slides.find();
@@ -9,6 +17,7 @@ exports.getSlides = async (req, res) => {
 exports.uploadSlides = async (req, res) => {
   try {
     let pictureFiles = req.files;
+    console.log("pictureFiles", pictureFiles);
     //Check if files exist
     if (!pictureFiles)
       return res.status(400).json({ message: "No picture attached!" });
