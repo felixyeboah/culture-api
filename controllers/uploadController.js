@@ -1,12 +1,5 @@
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require("../utils/cloudinary");
 const Upload = require("../models/upload");
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
-  secure: true,
-});
 
 exports.getImages = async (req, res) => {
   const images = await Upload.find();
@@ -54,7 +47,7 @@ exports.uploads = async (req, res) => {
       images: publicId,
     });
 
-    res.status(200).json(uploadResponse);
+    res.status(204).json(uploadResponse);
   } catch (err) {
     res.status(500).json({
       message: err.message,

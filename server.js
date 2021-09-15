@@ -60,6 +60,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 //routes
 const userRoutes = require("./routes/authRoute");
 const uploadRoutes = require("./routes/uploadRoute");
+const slidesRoutes = require("./routes/slidesRoute");
 
 //connect to database
 mongoose
@@ -123,6 +124,7 @@ app.use(
   ]),
   uploadRoutes
 );
+app.use("/api/v1/slides", upload.array("slides", 30), slidesRoutes);
 
 //start server
 const port = process.env.PORT || 4000;
