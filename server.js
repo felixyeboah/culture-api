@@ -117,10 +117,10 @@ app.use(
 //routes
 app.use("/api/v1/users", userRoutes);
 app.use(
-  "/api/v1/images",
+  "/api/v1/gallery",
   upload.fields([
     { name: "cover", maxCount: 1 },
-    { name: "images", maxCount: 400 },
+    { name: "images", maxCount: 450 },
   ]),
   uploadRoutes
 );

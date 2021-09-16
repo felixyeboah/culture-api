@@ -17,7 +17,6 @@ exports.getSlides = async (req, res) => {
 exports.uploadSlides = async (req, res) => {
   try {
     let pictureFiles = req.files;
-    console.log("pictureFiles", pictureFiles);
     //Check if files exist
     if (!pictureFiles)
       return res.status(400).json({ message: "No picture attached!" });
@@ -48,7 +47,22 @@ exports.uploadSlides = async (req, res) => {
 };
 
 exports.deleteSlide = async (req, res) => {
-  const slide = await Slides.findByIdAndDelete(req.params.id);
+  // const images = await Slides.find();
+  //
+  // console.log("req", req.body.public_id);
+  //
+  // const image = images.map((item) =>
+  //   item.images.filter((img) => img === req.body.public_id)
+  // );
+  //
+  // const img = image[0];
+
+  await cloudinary.uploader.destroy(req.body.public_id, {
+    invalidate: true,
+    resource_type: "image",
+  });
+
+  const slide = await Slides.findOneAndDelete({ images: req.body.public_id });
 
   if (!slide) {
     return res.status(400).json({ message: "No image found with this ID" });

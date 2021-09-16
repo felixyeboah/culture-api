@@ -5,8 +5,9 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.get("/", uploadController.getImages);
+router.get("/:slug", uploadController.getSingleImage);
 router.post(
-  "/upload",
+  "/",
   authController.protect,
   authController.restrictTo("admin"),
   uploadController.uploads

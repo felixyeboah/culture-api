@@ -6,7 +6,12 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.get("/", slidesController.getSlides);
-router.delete("/:id", slidesController.deleteSlide);
+router.patch(
+  "/",
+  authController.protect,
+  authController.restrictTo("admin"),
+  slidesController.deleteSlide
+);
 router.post(
   "/",
   authController.protect,

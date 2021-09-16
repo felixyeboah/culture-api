@@ -13,6 +13,14 @@ exports.getImages = async (req, res) => {
   res.status(200).json(images);
 };
 
+exports.getSingleImage = async (req, res) => {
+  const image = await Upload.findOne({ slug: req.params.slug });
+  if (!image) {
+    return res.status(400).json({ message: "Image not found!" });
+  }
+  res.status(200).json(image);
+};
+
 exports.uploads = async (req, res) => {
   try {
     if (!req.body.title)
@@ -29,7 +37,7 @@ exports.uploads = async (req, res) => {
     //upload cover
     let uploadedCover = cloudinary.uploader.upload(cover, {
       resource_type: "auto",
-      folder: "culture-curations/images",
+      folder: `culture-curations/gallery/${req.body.title}/cover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
@@ -37,7 +45,7 @@ exports.uploads = async (req, res) => {
     let multiplePicturePromise = pictureFiles.map((picture) =>
       cloudinary.uploader.upload(picture.path, {
         resource_type: "auto",
-        folder: "culture-curations/images",
+        folder: `culture-curations/gallery/${req.body.title}`,
         transformation: [{ quality: "auto", fetch_format: "auto" }],
       })
     );
