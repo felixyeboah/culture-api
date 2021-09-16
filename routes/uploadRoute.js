@@ -6,6 +6,12 @@ const router = express.Router();
 
 router.get("/", uploadController.getImages);
 router.get("/:slug", uploadController.getSingleImage);
+router.patch(
+  "/",
+  authController.protect,
+  authController.restrictTo("admin"),
+  uploadController.deleteImage
+);
 router.post(
   "/",
   authController.protect,

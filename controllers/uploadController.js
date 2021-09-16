@@ -69,3 +69,21 @@ exports.uploads = async (req, res) => {
     });
   }
 };
+
+exports.deleteImage = async (req, res) => {
+  await cloudinary.uploader.destroy(req.body.public_id, {
+    invalidate: true,
+    resource_type: "image",
+  });
+
+  const slide = await Upload.findOneAndDelete({ images: req.body.public_id });
+
+  if (!slide) {
+    return res.status(400).json({ message: "No image found with this ID" });
+  }
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+};
