@@ -24,15 +24,19 @@ exports.getOrders = catchAsync(async (req, res) => {
 exports.createPaymentHook = catchAsync(async (req, res, next) => {
   const { CheckoutId, clientReference } = req.body.Data;
 
-  console.log("body", req.body);
+  // console.log("body", req.body);
+  console.log("clientReference", clientReference);
+  console.log("CheckoutId", CheckoutId);
 
   if (req.body.Status === "Success") {
     const order = await Order.findById(clientReference);
+    console.log("order", order);
+    if (order) {
+      order.status = "success";
+      order.reference = CheckoutId;
 
-    order.status = "success";
-    order.reference = CheckoutId;
-
-    order.save();
+      order.save();
+    }
   }
 
   res.status(200).json({});
