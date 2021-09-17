@@ -1,5 +1,7 @@
 const cloudinary = require("cloudinary").v2;
-const Upload = require("../models/upload");
+const Upload = require("../models/Upload");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -13,31 +15,33 @@ exports.getImages = async (req, res) => {
   res.status(200).json(images);
 };
 
-exports.getSingleImage = async (req, res) => {
-  const image = await Upload.findOne({ slug: req.params.slug });
+exports.getSingleImage = catchAsync(async (req, res, next) => {
+  const { slug } = req.params;
+
+  const image = await Upload.findOne({ slug: slug });
   if (!image) {
-    return res.status(400).json({ message: "Image not found!" });
+    return next(new AppError("Image not found!", 400));
   }
   res.status(200).json(image);
-};
+});
 
-exports.uploads = async (req, res) => {
+exports.uploads = catchAsync(async (req, res, next) => {
+  const { title } = req.body;
+  const { cover, images } = req.files;
+
   try {
-    if (!req.body.title)
-      return res.status(400).json({ message: "Title is required" });
+    if (!title) return next(new AppError("Title is required!", 400));
 
-    let pictureFiles = req.files.images;
-    let cover = req.files.cover[0].path;
+    let pictureFiles = images;
+    let cover = cover[0].path;
     //Check if files exist
-    if (!cover)
-      return res.status(400).json({ message: "No cover picture attached!" });
-    if (!pictureFiles)
-      return res.status(400).json({ message: "No picture attached!" });
+    if (!cover) return next(new AppError("No cover picture attached!", 400));
+    if (!pictureFiles) return next(new AppError("No picture attached!", 400));
 
     //upload cover
     let uploadedCover = cloudinary.uploader.upload(cover, {
       resource_type: "auto",
-      folder: `culture-curations/gallery/${req.body.title}/cover`,
+      folder: `culture-curations/gallery/${title}/cover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
@@ -45,7 +49,7 @@ exports.uploads = async (req, res) => {
     let multiplePicturePromise = pictureFiles.map((picture) =>
       cloudinary.uploader.upload(picture.path, {
         resource_type: "auto",
-        folder: `culture-curations/gallery/${req.body.title}`,
+        folder: `culture-curations/gallery/${title}`,
         transformation: [{ quality: "auto", fetch_format: "auto" }],
       })
     );
@@ -68,22 +72,24 @@ exports.uploads = async (req, res) => {
       message: err.message,
     });
   }
-};
+});
 
-exports.deleteImage = async (req, res) => {
-  await cloudinary.uploader.destroy(req.body.public_id, {
+exports.deleteImage = catchAsync(async (req, res, next) => {
+  const { public_id } = req.body;
+
+  await cloudinary.uploader.destroy(public_id, {
     invalidate: true,
     resource_type: "image",
   });
 
-  const slide = await Upload.findOneAndDelete({ images: req.body.public_id });
+  const slide = await Upload.findOneAndDelete({ images: public_id });
 
   if (!slide) {
-    return res.status(400).json({ message: "No image found with this ID" });
+    return next(new AppError("No image found with this ID!", 400));
   }
 
   res.status(204).json({
     status: "success",
     data: null,
   });
-};
+});

@@ -1,6 +1,8 @@
 const cloudinary = require("cloudinary").v2;
 
 const Slides = require("../models/Slides");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -14,12 +16,11 @@ exports.getSlides = async (req, res) => {
   res.status(200).json(allSlides);
 };
 
-exports.uploadSlides = async (req, res) => {
+exports.uploadSlides = catchAsync(async (req, res, next) => {
   try {
     let pictureFiles = req.files;
     //Check if files exist
-    if (!pictureFiles)
-      return res.status(400).json({ message: "No picture attached!" });
+    if (!pictureFiles) return next(new AppError("No picture attached!", 400));
 
     //map through images and create a promise array using uploadController upload function
     let multiplePicturePromise = pictureFiles.map((picture) =>
@@ -44,9 +45,9 @@ exports.uploadSlides = async (req, res) => {
       message: err.message,
     });
   }
-};
+});
 
-exports.deleteSlide = async (req, res) => {
+exports.deleteSlide = catchAsync(async (req, res, next) => {
   // const images = await Slides.find();
   //
   // console.log("req", req.body.public_id);
@@ -65,11 +66,11 @@ exports.deleteSlide = async (req, res) => {
   const slide = await Slides.findOneAndDelete({ images: req.body.public_id });
 
   if (!slide) {
-    return res.status(400).json({ message: "No image found with this ID" });
+    return next(new AppError("No image found with this ID!", 400));
   }
 
   res.status(204).json({
     status: "success",
     data: null,
   });
-};
+});
