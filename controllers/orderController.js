@@ -24,6 +24,8 @@ exports.getOrders = catchAsync(async (req, res) => {
 exports.createPaymentHook = catchAsync(async (req, res, next) => {
   const { CheckoutId, clientReference } = req.body.Data;
 
+  console.log("body", req.body);
+
   if (req.body.Status === "Success") {
     const order = await Order.findById(clientReference);
 
