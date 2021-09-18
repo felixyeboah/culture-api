@@ -28,6 +28,20 @@ exports.getOrders = catchAsync(async (req, res) => {
   res.status(200).json(orders);
 });
 
+exports.getOrder = catchAsync(async (req, res, next) => {
+  const order = await Order.findById(req.params.id)
+    .populate("user", "firstName lastName email phoneNumber")
+    .populate({
+      path: "ticket",
+      select: "name",
+      populate: { path: "event", select: "name" },
+    });
+
+  if (!order) return next(new AppError("Order not found!", 400));
+
+  res.status(200).json(order);
+});
+
 exports.createPaymentHook = catchAsync(async (req, res) => {
   const {
     CheckoutId,
@@ -52,16 +66,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.amount = Amount;
       order.invoiceId = SalesInvoiceId;
 
-      //QRCode
-      const orderData = JSON.stringify({
-        name: `${order.user.firstName} ${order.user.lastName}`,
-        email: order.user.email,
-        phoneNumber: order.user.phoneNumber,
-        ticketName: order.ticket.name,
-        eventName: order.ticket.event.name,
-      });
-
-      order.url = await QRCode.toDataURL(orderData);
+      order.url = await QRCode.toDataURL(
+        `http://localhost:3000/validate/?orderId=${order._id}`
+      );
 
       console.log("order", order);
 
