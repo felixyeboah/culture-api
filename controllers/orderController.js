@@ -580,7 +580,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                             line-height: 39.2px;
                                             font-size: 28px;
                                           "
-                                          >${order.ticket.event.name} QR CODE
+                                          >${order.ticket.event.name}
                                         </span></strong
                                       ></span
                                     >
@@ -719,10 +719,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                 align="left"
                               >
                                 <div style="text-align: center">
-                                  <img
-                                  src=${order.url}
-                                    alt="qr code"
-                                  />
+                                  <img src="${order.url}" alt="qr code " />
                                 </div>
                               </td>
                             </tr>
