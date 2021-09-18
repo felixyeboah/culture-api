@@ -3,6 +3,7 @@ const Order = require("../models/Order");
 const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
+const { v2: cloudinary } = require("cloudinary");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
   if (!req.user._id) return next(new AppError("User is required!", 400));
@@ -67,9 +68,20 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.amount = Amount;
       order.invoiceId = SalesInvoiceId;
 
-      order.url = await QRCode.toDataURL(
+      const base64QRCode = await QRCode.toDataURL(
         `https://www.curatedbyculture.com/validate?orderId=${order._id}`
       );
+
+      let uploadedCover = cloudinary.uploader.upload(base64QRCode, {
+        resource_type: "auto",
+        folder: `culture-curations/email`,
+        transformation: [{ quality: "auto", fetch_format: "auto" }],
+      });
+
+      // await all the uploadController upload functions in promise.all, exactly where the magic happens
+      let coverResponse = await Promise.all([uploadedCover]);
+
+      order.url = coverResponse[0].url;
 
       //Save order
       order.save();
@@ -719,11 +731,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                 align="left"
                               >
                                 <div style="text-align: center">
-                                  <img src="{order.url}" alt="qr code" />
-                                  <img src="order.url" alt="qr code 1" />
                                   <img src={order.url} alt="qr code 2" />
                                   <img src=${order.url} alt="qr code 3" />
-                                  <img src="${order.url}" alt="qr code 3" />
+                                  <img src="${order.url}" alt="qr code 4" />
                                 </div>
                               </td>
                             </tr>
