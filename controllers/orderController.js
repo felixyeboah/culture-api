@@ -36,7 +36,7 @@ exports.getOrder = catchAsync(async (req, res, next) => {
     .populate({
       path: "ticket",
       select: "name price",
-      populate: { path: "event", select: "name" },
+      populate: { path: "event", select: "name date" },
     });
 
   if (!order) return next(new AppError("Order not found!", 400));
@@ -731,9 +731,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                 align="left"
                               >
                                 <div style="text-align: center">
-                                  <img src={order.url} alt="qr code 2" />
-                                  <img src=${order.url} alt="qr code 3" />
-                                  <img src="${order.url}" alt="qr code 4" />
+                                  <img src="${order.url}" alt=${order.url} />
                                 </div>
                               </td>
                             </tr>
