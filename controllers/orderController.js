@@ -719,7 +719,11 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                 align="left"
                               >
                                 <div style="text-align: center">
-                                  <img src="${order.url}" alt="qr code " />
+                                  <img src="{order.url}" alt="qr code" />
+                                  <img src="order.url" alt="qr code 1" />
+                                  <img src={order.url} alt="qr code 2" />
+                                  <img src=${order.url} alt="qr code 3" />
+                                  <img src="${order.url}" alt="qr code 3" />
                                 </div>
                               </td>
                             </tr>
