@@ -61,9 +61,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
         eventName: order.ticket.event.name,
       });
 
-      QRCode.toDataURL(orderData, function (err, url) {
-        order.url = url;
-      });
+      order.url = await QRCode.toDataURL(orderData);
 
       console.log("order", order);
 
