@@ -33,7 +33,7 @@ exports.getOrder = catchAsync(async (req, res, next) => {
     .populate("user", "firstName lastName email phoneNumber")
     .populate({
       path: "ticket",
-      select: "name",
+      select: "name price",
       populate: { path: "event", select: "name" },
     });
 
@@ -67,7 +67,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.invoiceId = SalesInvoiceId;
 
       order.url = await QRCode.toDataURL(
-        `http://localhost:3000/validate/?orderId=${order._id}`
+        `https://www.curatedbyculture.com/validate?orderId=${order._id}`
       );
 
       console.log("order", order);
