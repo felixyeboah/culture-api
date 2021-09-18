@@ -17,7 +17,13 @@ exports.createOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.getOrders = catchAsync(async (req, res) => {
-  const orders = await Order.find();
+  const orders = await Order.find()
+    .populate("user", "firstName lastName email phoneNumber")
+    .populate({
+      path: "ticket",
+      select: "name price",
+      populate: { path: "event", select: "name" },
+    });
 
   res.status(200).json(orders);
 });
@@ -55,7 +61,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
         eventName: order.ticket.event.name,
       });
 
-      order.url = await QRCode.toString(orderData);
+      QRCode.toDataURL(orderData, function (err, url) {
+        order.url = url;
+      });
 
       console.log("order", order);
 
