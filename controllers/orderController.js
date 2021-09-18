@@ -531,7 +531,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                   <p style="font-size: 14px; line-height: 140%">
                                     <strong
                                       >T H A N K S&nbsp; &nbsp;F O R&nbsp;
-                                      &nbsp;S I G N I N G&nbsp; &nbsp;U P
+                                      &nbsp;P U R C H A S I N G&nbsp; &nbsp;T H E&nbsp; &nbsp;T I C K E T
                                       !</strong
                                     >
                                   </p>
@@ -580,7 +580,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                             line-height: 39.2px;
                                             font-size: 28px;
                                           "
-                                          >Verify Your E-mail Address
+                                          >${order.ticket.event.name} QR CODE
                                         </span></strong
                                       ></span
                                     >
@@ -720,7 +720,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                               >
                                 <div style="text-align: center">
                                   <img
-                                  src="${order.url}"
+                                  src=${order.url}
                                     alt="qr code"
                                   />
                                 </div>
