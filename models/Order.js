@@ -15,10 +15,23 @@ const ordersSchema = new mongoose.Schema(
     reference: {
       type: String,
     },
+    phoneNumber: {
+      type: String,
+    },
+    amount: {
+      type: Number,
+      default: 0.0,
+    },
+    invoiceId: {
+      type: String,
+    },
     status: {
       type: String,
       enum: ["pending", "success"],
       default: "pending",
+    },
+    url: {
+      type: String,
     },
   },
   {

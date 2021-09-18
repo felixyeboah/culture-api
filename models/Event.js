@@ -11,7 +11,7 @@ const eventSchema = new mongoose.Schema(
       required: [true, "Cover is required!"],
     },
     date: {
-      type: Date,
+      type: String,
       required: [true, "Date is required!"],
     },
     location: {

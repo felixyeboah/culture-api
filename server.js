@@ -62,6 +62,8 @@ const userRoutes = require("./routes/authRoute");
 const uploadRoutes = require("./routes/uploadRoute");
 const slidesRoutes = require("./routes/slidesRoute");
 const orderRoute = require("./routes/orderRoute");
+const eventRoute = require("./routes/eventRoute");
+const ticketRoute = require("./routes/ticketRoute");
 
 //connect to database
 mongoose
@@ -127,6 +129,8 @@ app.use(
 );
 app.use("/api/v1/slides", upload.array("slides", 30), slidesRoutes);
 app.use("/api/v1/orders", orderRoute);
+app.use("/api/v1/events", upload.single("cover"), eventRoute);
+app.use("/api/v1/tickets", ticketRoute);
 
 //start server
 const port = process.env.PORT || 4000;
