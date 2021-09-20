@@ -2,6 +2,7 @@ const cloudinary = require("cloudinary").v2;
 const Upload = require("../models/Upload");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const upload = require("../utils/upload");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -9,6 +10,11 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET,
   secure: true,
 });
+
+exports.uploadGalleryImages = upload.fields([
+  { name: "cover", maxCount: 1 },
+  { name: "images", maxCount: 450 },
+]);
 
 exports.getImages = async (req, res) => {
   const images = await Upload.find();

@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-
+const upload = require("../utils/upload");
 const Slides = require("../models/Slides");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -10,6 +10,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET,
   secure: true,
 });
+
+exports.uploadSlidesImages = upload.array("slides", 30);
 
 exports.getSlides = async (req, res) => {
   const allSlides = await Slides.find();

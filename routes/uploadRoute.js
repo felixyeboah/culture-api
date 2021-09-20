@@ -6,17 +6,12 @@ const router = express.Router();
 
 router.get("/", uploadController.getImages);
 router.get("/:slug", uploadController.getSingleImage);
-router.patch(
-  "/",
-  authController.protect,
-  authController.restrictTo("admin"),
-  uploadController.deleteImage
-);
-router.post(
-  "/",
-  authController.protect,
-  authController.restrictTo("admin"),
-  uploadController.uploads
-);
+
+//protected  and by admin only
+router.use(authController.protect, authController.restrictTo("admin"));
+router
+  .route("/")
+  .post(uploadController.uploadGalleryImages, uploadController.uploads)
+  .patch(uploadController.deleteImage);
 
 module.exports = router;

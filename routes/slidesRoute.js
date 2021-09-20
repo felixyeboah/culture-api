@@ -6,17 +6,12 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.get("/", slidesController.getSlides);
-router.patch(
-  "/",
-  authController.protect,
-  authController.restrictTo("admin"),
-  slidesController.deleteSlide
-);
-router.post(
-  "/",
-  authController.protect,
-  authController.restrictTo("admin"),
-  slidesController.uploadSlides
-);
+
+//protected and by admin
+router.use(authController.protect, authController.restrictTo("admin"));
+router
+  .route("/")
+  .post(slidesController.uploadSlidesImages, slidesController.uploadSlides)
+  .patch(slidesController.deleteSlide);
 
 module.exports = router;

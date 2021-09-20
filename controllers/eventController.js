@@ -2,18 +2,28 @@ const catchAsync = require("../utils/catchAsync");
 const Event = require("../models/Event");
 const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
+const upload = require("../utils/upload");
 
 exports.getEvents = catchAsync(async (req, res) => {
   const events = await Event.find();
   res.status(200).json(events);
 });
 
+exports.uploadEventCover = upload.single("cover");
+
 exports.createEvent = catchAsync(async (req, res, next) => {
   const { name, date, location, time } = req.body;
   const { path: cover } = req.file;
 
-  //Check if cover exist
+  //Check if all req exist
   if (!cover) return next(new AppError("No cover picture attached!", 400));
+  if (!name) return next(new AppError("Name is required!", 400));
+  if (!date) return next(new AppError("Date is required!", 400));
+  if (!location) return next(new AppError("Location is required!", 400));
+  if (!time) return next(new AppError("Time is required!", 400));
+
+  console.log("cover", cover);
+  console.log("cover", req.body);
 
   let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
@@ -33,6 +43,8 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     time: time,
     cover: coverImage,
   });
+
+  console.log("event", event);
 
   res.status(201).json(event);
 });

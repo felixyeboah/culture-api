@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const eventSchema = new mongoose.Schema(
   {
@@ -6,12 +7,13 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required!"],
     },
+    slug: String,
     cover: {
       type: String,
       required: [true, "Cover is required!"],
     },
     date: {
-      type: String,
+      type: Date,
       required: [true, "Date is required!"],
     },
     location: {
@@ -27,6 +29,11 @@ const eventSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+eventSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
 const Event = mongoose.model("Event", eventSchema);
 

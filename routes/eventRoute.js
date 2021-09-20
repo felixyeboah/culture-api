@@ -4,12 +4,13 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-// router.get("/", orderController.getOrders);
-router.post(
-  "/",
-  authController.protect,
-  authController.restrictTo("admin"),
-  eventController.createEvent
-);
+router.get("/", eventController.getEvents);
+
+// Actions can be taken by admin
+router.use(authController.protect);
+router.use(authController.restrictTo("admin"));
+router
+  .route("/")
+  .post(eventController.uploadEventCover, eventController.createEvent);
 
 module.exports = router;
