@@ -3,6 +3,7 @@ const Event = require("../models/Event");
 const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
+const slugify = require("slugify");
 
 exports.getEvents = catchAsync(async (req, res) => {
   const events = await Event.find();
@@ -22,12 +23,11 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   if (!location) return next(new AppError("Location is required!", 400));
   if (!time) return next(new AppError("Time is required!", 400));
 
-  console.log("cover", cover);
-  console.log("cover", req.body);
+  const slug = slugify(name, { lower: true });
 
   let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
-    folder: `culture-curations/events/${name}`,
+    folder: `culture-curations/events/${slug}`,
     transformation: [{ quality: "auto", fetch_format: "auto" }],
   });
 
@@ -43,8 +43,6 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     time: time,
     cover: coverImage,
   });
-
-  console.log("event", event);
 
   res.status(201).json(event);
 });
