@@ -1323,7 +1323,7 @@ exports.register = catchAsync(async (req, res, next) => {
  */
 exports.verifyUser = async (req, res) => {
   try {
-    let user = await User.findOne({ token: req.query.token });
+    let user = await User.findOne({ token: req.params.token });
     if (!user) {
       return res.status(401).json({
         success: false,
