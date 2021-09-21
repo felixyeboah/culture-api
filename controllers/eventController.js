@@ -5,6 +5,10 @@ const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
 
+const parseDate = (item) => {
+  return item.toISOString().split("T")[0];
+};
+
 exports.uploadEventCover = upload.single("cover");
 
 exports.getEvents = catchAsync(async (req, res) => {
@@ -32,9 +36,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   if (!location) return next(new AppError("Location is required!", 400));
   if (!time) return next(new AppError("Time is required!", 400));
 
-  const newDate = date.toISOString().split("T")[0];
-
-  const slug = slugify(`${name} ${newDate}`, {
+  const slug = slugify(`${name} ${parseDate(date)}`, {
     lower: true,
   });
 
@@ -66,9 +68,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
 
   const { path: cover } = req.file;
 
-  const newDate = date.toISOString().split("T")[0];
-
-  const slug = slugify(`${name} ${newDate}`, {
+  const slug = slugify(`${name} ${parseDate(date)}`, {
     lower: true,
   });
 
