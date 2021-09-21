@@ -4,7 +4,6 @@ const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
-const { filterObj } = require("../utils/filterObject");
 
 exports.uploadEventCover = upload.single("cover");
 
@@ -33,7 +32,9 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   if (!location) return next(new AppError("Location is required!", 400));
   if (!time) return next(new AppError("Time is required!", 400));
 
-  const slug = slugify(name, { lower: true });
+  const slug = slugify({ name: date }, { lower: true });
+
+  console.log("slug", slug);
 
   let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
@@ -54,10 +55,12 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     cover: coverImage,
   });
 
+  console.log("event", event);
+
   res.status(201).json(event);
 });
 
-exports.updateEvent = catchAsync(async (req, res, next) => {
+exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, date, time, location } = req.body;
 
