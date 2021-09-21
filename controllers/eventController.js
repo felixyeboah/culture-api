@@ -66,7 +66,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
 
   const { path: cover } = req.file;
 
-  const slug = slugify(name, { lower: true });
+  const slug = slugify({ name: date }, { lower: true });
 
   let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
