@@ -785,7 +785,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                         font-size: 18px;
                                         line-height: 28.8px;
                                       "
-                                      >Culture Curations Management<br
+                                      >Culture Management Group<br
                                     /></span>
                                   </p>
                                 </div>
