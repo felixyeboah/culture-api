@@ -31,7 +31,7 @@ const eventSchema = new mongoose.Schema(
 );
 
 eventSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, { lower: true });
+  this.slug = slugify(`${this.name}${this.date}`, { lower: true });
   next();
 });
 
