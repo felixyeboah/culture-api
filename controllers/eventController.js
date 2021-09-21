@@ -36,7 +36,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   if (!location) return next(new AppError("Location is required!", 400));
   if (!time) return next(new AppError("Time is required!", 400));
 
-  const slug = slugify(`${name} ${date}`, {
+  const slug = slugify(`${name} ${date.split("T")[0]}`, {
     lower: true,
   });
 
@@ -68,7 +68,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
 
   const { path: cover } = req.file;
 
-  const slug = slugify(`${name} ${date}`, {
+  const slug = slugify(`${name} ${date.split("T")[0]}`, {
     lower: true,
   });
 
