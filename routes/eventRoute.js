@@ -13,4 +13,10 @@ router
   .route("/")
   .post(eventController.uploadEventCover, eventController.createEvent);
 
+router
+  .route("/:id")
+  .get(eventController.getEvent)
+  .patch(eventController.updateEvent)
+  .delete(eventController.deleteEvent);
+
 module.exports = router;

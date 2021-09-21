@@ -10,9 +10,15 @@ exports.createOrder = catchAsync(async (req, res, next) => {
 
   if (!req.body.ticket) return next(new AppError("Ticket is required!", 400));
 
-  const order = await Order.create({
+  let order = await Order.create({
     user: req.user._id,
     ticket: req.body.ticket,
+  });
+
+  order = await order.populate({
+    path: "ticket",
+    select: "name price",
+    populate: { path: "event", select: "name" },
   });
 
   res.status(201).json(order);

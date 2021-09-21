@@ -4,13 +4,23 @@ const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
+const { filterObj } = require("../utils/filterObject");
+
+exports.uploadEventCover = upload.single("cover");
 
 exports.getEvents = catchAsync(async (req, res) => {
   const events = await Event.find();
   res.status(200).json(events);
 });
 
-exports.uploadEventCover = upload.single("cover");
+exports.getEvent = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const event = await Event.findOne({ slug: id });
+  if (!event) return next(new AppError("No event found!", 400));
+
+  res.status(200).json(event);
+});
 
 exports.createEvent = catchAsync(async (req, res, next) => {
   const { name, date, location, time } = req.body;
@@ -45,4 +55,51 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   });
 
   res.status(201).json(event);
+});
+
+exports.updateEvent = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { name, date, time, location } = req.body;
+
+  const { path: cover } = req.file;
+
+  const slug = slugify(name, { lower: true });
+
+  let uploadedCover = cloudinary.uploader.upload(cover, {
+    resource_type: "auto",
+    folder: `culture-curations/events/${slug}`,
+    transformation: [{ quality: "auto", fetch_format: "auto" }],
+  });
+
+  // await all the uploadController upload functions in promise.all, exactly where the magic happens
+  let coverResponse = await Promise.all([uploadedCover]);
+
+  const coverImage = coverResponse[0].public_id;
+
+  const event = await Event.findByIdAndUpdate(
+    id,
+    {
+      name: name,
+      date: date,
+      time: time,
+      location: location,
+      cover: coverImage,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json(event);
+});
+
+exports.deleteEvent = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const event = await Event.findByIdAndDelete(id);
+
+  if (!event) return next(new AppError("No event found!", 400));
+
+  res.status(200).json({});
 });
