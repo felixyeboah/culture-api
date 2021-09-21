@@ -659,9 +659,7 @@ exports.register = catchAsync(async (req, res, next) => {
                                         font-size: 22px;
                                         line-height: 35.2px;
                                       "
-                                      >Hi, ${newUser.firstName} ${
-    newUser.lastName
-  }
+                                      >Hi, ${newUser.firstName} ${newUser.lastName}
                                     </span>
                                   </p>
                                   <p style="font-size: 14px; line-height: 160%">
@@ -672,8 +670,7 @@ exports.register = catchAsync(async (req, res, next) => {
                                       "
                                       >You're almost ready to get started.
                                       Please click on the button below to verify
-                                      your email address and enjoy exclusive
-                                      cleaning services with us!
+                                      your email address and enjoy entertainment with us!
                                     </span>
                                   </p>
                                 </div>
@@ -704,9 +701,7 @@ exports.register = catchAsync(async (req, res, next) => {
                                 <div align="center">
                                   <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;font-family:'Cabin',sans-serif;"><tr><td style="font-family:'Cabin',sans-serif;" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="" style="height:46px; v-text-anchor:middle; width:155px;" arcsize="8.5%" stroke="f" fillcolor="#ff6600"><w:anchorlock/><center style="color:#FFFFFF;font-family:'Cabin',sans-serif;"><![endif]-->
                                   <a
-                                    href="${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/verify?token=${newUser.token}"
+                                    href="https://www.curatedbyculture.com/auth/confirm?token=${newUser.token}"
                                     target="_blank"
                                     style="
                                       box-sizing: border-box;
@@ -799,7 +794,7 @@ exports.register = catchAsync(async (req, res, next) => {
                                         font-size: 18px;
                                         line-height: 28.8px;
                                       "
-                                      >Culture Curations Management<br
+                                      >Culture Management Group<br
                                     /></span>
                                   </p>
                                 </div>
