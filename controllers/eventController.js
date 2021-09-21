@@ -53,7 +53,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
   const event = await Event.create({
     name: name,
-    date: date,
+    date: date.split("T")[0],
     location: location,
     time: time,
     cover: coverImage,
