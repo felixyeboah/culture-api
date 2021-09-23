@@ -5,10 +5,6 @@ const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
 
-const parseDate = (item) => {
-  return item.toISOString().split("T")[0];
-};
-
 exports.uploadEventCover = upload.single("cover");
 
 exports.getEvents = catchAsync(async (req, res) => {
@@ -66,15 +62,11 @@ exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, date, time, location } = req.body;
 
-  const { path: cover } = req.file;
-
-  const slug = slugify(`${name} ${date.split("T")[0]}`, {
-    lower: true,
-  });
+  const { path: cover, originalname } = req.file;
 
   let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
-    folder: `culture-curations/events/${slug}`,
+    folder: `culture-curations/events/${originalname}`,
     transformation: [{ quality: "auto", fetch_format: "auto" }],
   });
 

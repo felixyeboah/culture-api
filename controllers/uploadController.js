@@ -39,13 +39,13 @@ exports.uploads = catchAsync(async (req, res, next) => {
     if (!title) return next(new AppError("Title is required!", 400));
 
     let pictureFiles = images;
-    let cover = cover[0].path;
+    let newCover = cover[0].path;
     //Check if files exist
-    if (!cover) return next(new AppError("No cover picture attached!", 400));
+    if (!newCover) return next(new AppError("No cover picture attached!", 400));
     if (!pictureFiles) return next(new AppError("No picture attached!", 400));
 
     //upload cover
-    let uploadedCover = cloudinary.uploader.upload(cover, {
+    let uploadedCover = cloudinary.uploader.upload(newCover, {
       resource_type: "auto",
       folder: `culture-curations/gallery/${title}/cover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
@@ -67,7 +67,7 @@ exports.uploads = catchAsync(async (req, res, next) => {
     const coverImage = coverResponse[0].public_id;
 
     const uploadResponse = await Upload.create({
-      title: req.body.title,
+      title: title,
       cover: coverImage,
       images: publicId,
     });

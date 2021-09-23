@@ -5,10 +5,12 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.get("/", uploadController.getImages);
-router.get("/:slug", uploadController.getSingleImage);
 
 //protected  and by admin only
-router.use(authController.protect, authController.restrictTo("admin"));
+router.use(authController.protect);
+router.get("/:slug", uploadController.getSingleImage);
+
+router.use(authController.restrictTo("admin"));
 router
   .route("/")
   .post(uploadController.uploadGalleryImages, uploadController.uploads)
