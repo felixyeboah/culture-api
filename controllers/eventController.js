@@ -4,7 +4,6 @@ const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
-
 exports.uploadEventCover = upload.single("cover");
 
 exports.getEvents = catchAsync(async (req, res) => {

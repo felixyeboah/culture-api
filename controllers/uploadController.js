@@ -80,6 +80,38 @@ exports.uploads = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.updateGallery = catchAsync(async (req, res, next) => {
+  const { title } = req.body;
+  const { cover } = req.files;
+
+  let newCover = cover[0].path;
+
+  //upload cover
+  let uploadedCover = cloudinary.uploader.upload(newCover, {
+    resource_type: "auto",
+    folder: `culture-curations/gallery/${title}/cover`,
+    transformation: [{ quality: "auto", fetch_format: "auto" }],
+  });
+
+  // await all the uploadController upload functions in promise.all, exactly where the magic happens
+  let coverResponse = await Promise.all([uploadedCover]);
+
+  const coverImage = coverResponse[0].public_id;
+
+  const updatedCover = await Upload.findByIdAndUpdate(
+    req.params.id,
+    {
+      cover: coverImage,
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedCover)
+    return next(new AppError("No Item found with this ID!", 400));
+
+  res.status(200).json(updatedCover);
+});
+
 exports.deleteImage = catchAsync(async (req, res, next) => {
   const { public_id } = req.body;
 
