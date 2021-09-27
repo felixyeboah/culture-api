@@ -16,6 +16,10 @@ router
   .post(uploadController.uploadGalleryImages, uploadController.uploads)
   .patch(uploadController.deleteImage);
 
-router.patch("/:id", uploadController.updateGallery);
+router.patch(
+  "/:id",
+  uploadController.updateGalleryCover,
+  uploadController.updateGallery
+);
 
 module.exports = router;

@@ -16,6 +16,8 @@ exports.uploadGalleryImages = upload.fields([
   { name: "images", maxCount: 450 },
 ]);
 
+exports.updateGalleryCover = upload.single("cover");
+
 exports.getImages = async (req, res) => {
   const images = await Upload.find();
   res.status(200).json(images);
@@ -82,14 +84,17 @@ exports.uploads = catchAsync(async (req, res, next) => {
 
 exports.updateGallery = catchAsync(async (req, res, next) => {
   const { title } = req.body;
-  const { cover } = req.files;
+  const { path: cover } = req.file;
 
-  let newCover = cover[0].path;
+  //find item by ID
+  const item = await Upload.findOne({ id: req.params.id });
+
+  if (!item) return next(new AppError("No Item found with this ID!", 400));
 
   //upload cover
-  let uploadedCover = cloudinary.uploader.upload(newCover, {
+  let uploadedCover = cloudinary.uploader.upload(cover, {
     resource_type: "auto",
-    folder: `culture-curations/gallery/${title}/cover`,
+    folder: `culture-curations/gallery/${item.slug}/cover`,
     transformation: [{ quality: "auto", fetch_format: "auto" }],
   });
 
@@ -101,6 +106,7 @@ exports.updateGallery = catchAsync(async (req, res, next) => {
   const updatedCover = await Upload.findByIdAndUpdate(
     req.params.id,
     {
+      title: title,
       cover: coverImage,
     },
     { new: true, runValidators: true }
