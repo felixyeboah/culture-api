@@ -51,6 +51,8 @@ exports.updateTicket = catchAsync(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
+  if (!ticket) return next(new AppError("No event found!", 400));
+
   res.status(200).json(ticket);
 });
 
@@ -61,5 +63,5 @@ exports.deleteTicket = catchAsync(async (req, res, next) => {
 
   if (!ticket) return next(new AppError("No event found!", 400));
 
-  res.status(200).json({});
+  res.status(204).json({});
 });

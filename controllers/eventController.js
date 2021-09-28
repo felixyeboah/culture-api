@@ -99,5 +99,5 @@ exports.deleteEvent = catchAsync(async (req, res, next) => {
 
   if (!event) return next(new AppError("No event found!", 400));
 
-  res.status(200).json({});
+  res.status(204).json({});
 });
