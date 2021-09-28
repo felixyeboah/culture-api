@@ -59,6 +59,10 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
     SalesInvoiceId,
   } = req.body.Data;
 
+  console.log("data", req.body);
+
+  console.log("ClientReference", ClientReference);
+
   if (req.body.Status === "Success") {
     const order = await Order.findById(ClientReference)
       .populate("user", "firstName lastName email phoneNumber")
@@ -67,6 +71,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
         select: "name",
         populate: { path: "event", select: "name" },
       });
+    console.log("first order", order);
     if (order) {
       order.status = "success";
       order.reference = CheckoutId;
@@ -91,6 +96,8 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 
       //Save order
       order.save();
+
+      console.log("save order", order);
 
       const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html

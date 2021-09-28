@@ -4,10 +4,9 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/payment-hook", orderController.createPaymentHook);
-
 router.use(authController.protect);
 router.post("/", orderController.createOrder);
+router.post("/payment-hook", orderController.createPaymentHook);
 
 router.use(authController.restrictTo("admin"));
 router.get("/", orderController.getOrders);
