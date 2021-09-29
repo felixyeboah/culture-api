@@ -9,6 +9,7 @@ router.get("/", eventController.getEvents);
 // Actions can be taken by admin
 router.use(authController.protect);
 router.route("/:id").get(eventController.getEvent);
+
 router.use(authController.restrictTo("admin"));
 router
   .route("/")
