@@ -24,6 +24,11 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, "Time is required!"],
     },
+    status: {
+      type: String,
+      enum: ["publish", "draft"],
+      default: "draft",
+    },
   },
   {
     timestamps: true,

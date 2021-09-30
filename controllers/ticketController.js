@@ -19,11 +19,11 @@ exports.getTicket = catchAsync(async (req, res, next) => {
 });
 
 exports.createTicket = catchAsync(async (req, res, next) => {
-  const { event, name, people, price, options } = req.body;
+  const { event, name, people, price, options, type } = req.body;
 
   if (!name) return next(new AppError("Name is required!", 400));
   if (!people) return next(new AppError("People is required!", 400));
-  if (!price) return next(new AppError("Price is required!", 400));
+  if (!type) return next(new AppError("Type is required!", 400));
 
   const ticket = await Ticket.create({
     event,
@@ -31,6 +31,7 @@ exports.createTicket = catchAsync(async (req, res, next) => {
     people,
     price,
     options,
+    type,
   });
 
   res.status(201).json(ticket);
@@ -38,7 +39,7 @@ exports.createTicket = catchAsync(async (req, res, next) => {
 
 exports.updateTicket = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { name, people, price, options } = req.body;
+  const { name, people, price, options, type } = req.body;
 
   const ticket = Ticket.findByIdAndUpdate(
     id,
@@ -47,6 +48,7 @@ exports.updateTicket = catchAsync(async (req, res, next) => {
       people: people,
       price: price,
       options: options,
+      type: type,
     },
     { new: true, runValidators: true }
   );

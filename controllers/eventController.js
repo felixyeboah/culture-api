@@ -21,7 +21,7 @@ exports.getEvent = catchAsync(async (req, res, next) => {
 });
 
 exports.createEvent = catchAsync(async (req, res, next) => {
-  const { name, date, location, time } = req.body;
+  const { name, date, location, time, status } = req.body;
   const { path: cover } = req.file;
 
   //Check if all req exist
@@ -30,6 +30,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   if (!date) return next(new AppError("Date is required!", 400));
   if (!location) return next(new AppError("Location is required!", 400));
   if (!time) return next(new AppError("Time is required!", 400));
+  if (!status) return next(new AppError("Time is required!", 400));
 
   const slug = slugify(`${name} ${date.split("T")[0]}`, {
     lower: true,
@@ -52,6 +53,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     location: location,
     time: time,
     cover: coverImage,
+    status: status,
   });
 
   res.status(201).json(event);
@@ -59,7 +61,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { name, date, time, location } = req.body;
+  const { name, date, time, location, status } = req.body;
 
   const { path: cover, originalname } = req.file;
 
@@ -82,6 +84,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
       time: time,
       location: location,
       cover: coverImage,
+      status: status,
     },
     {
       new: true,

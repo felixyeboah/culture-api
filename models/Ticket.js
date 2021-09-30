@@ -11,14 +11,16 @@ const ticketSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required!"],
     },
-    people: {
-      type: Number,
-      required: [true, "Number of people is required!"],
-    },
+    people: Number,
     price: {
       type: Number,
       required: [true, "Price is required!"],
       default: 0.0,
+    },
+    type: {
+      type: String,
+      enum: ["table", "ticket"],
+      default: "table",
     },
     options: [String],
   },
