@@ -21,8 +21,9 @@ exports.getTicket = catchAsync(async (req, res, next) => {
 exports.createTicket = catchAsync(async (req, res, next) => {
   const { event, name, people, price, options, type } = req.body;
 
+  if (!event) return next(new AppError("Event is required!", 400));
   if (!name) return next(new AppError("Name is required!", 400));
-  if (!people) return next(new AppError("People is required!", 400));
+  if (!price) return next(new AppError("Price is required!", 400));
   if (!type) return next(new AppError("Type is required!", 400));
 
   const ticket = await Ticket.create({
@@ -38,20 +39,10 @@ exports.createTicket = catchAsync(async (req, res, next) => {
 });
 
 exports.updateTicket = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const { name, people, price, options, type } = req.body;
-
-  const ticket = Ticket.findByIdAndUpdate(
-    id,
-    {
-      name: name,
-      people: people,
-      price: price,
-      options: options,
-      type: type,
-    },
-    { new: true, runValidators: true }
-  );
+  const ticket = Ticket.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
   if (!ticket) return next(new AppError("No event found!", 400));
 
