@@ -9,9 +9,9 @@ router.get("/:id", orderController.getOrder);
 
 router.use(authController.protect);
 router.post("/", orderController.createOrder);
+router.get("/", orderController.getOrders);
 
 router.use(authController.restrictTo("admin"));
-router.get("/", orderController.getOrders);
 router.route("/:id").delete(orderController.deleteOrder);
 
 module.exports = router;
