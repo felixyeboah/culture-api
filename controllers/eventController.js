@@ -4,10 +4,16 @@ const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
+
 exports.uploadEventCover = upload.single("cover");
 
 exports.getEvents = catchAsync(async (req, res) => {
-  const events = await Event.find();
+  const sort = {};
+
+  if (req.query.sort && req.query.order) {
+    sort[req.query.sort] = req.query.order === "desc" ? -1 : 1;
+  }
+  const events = await Event.find().sort("-date");
   res.status(200).json(events);
 });
 
@@ -63,18 +69,22 @@ exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, date, time, location, status } = req.body;
 
-  const { path: cover, originalname } = req.file;
+  let coverImage;
 
-  let uploadedCover = cloudinary.uploader.upload(cover, {
-    resource_type: "auto",
-    folder: `culture-curations/events/${originalname}`,
-    transformation: [{ quality: "auto", fetch_format: "auto" }],
-  });
+  if (req.file) {
+    const { path: cover, originalname } = req.file;
 
-  // await all the uploadController upload functions in promise.all, exactly where the magic happens
-  let coverResponse = await Promise.all([uploadedCover]);
+    let uploadedCover = cloudinary.uploader.upload(cover, {
+      resource_type: "auto",
+      folder: `culture-curations/events/${originalname}`,
+      transformation: [{ quality: "auto", fetch_format: "auto" }],
+    });
 
-  const coverImage = coverResponse[0].public_id;
+    // await all the uploadController upload functions in promise.all, exactly where the magic happens
+    let coverResponse = await Promise.all([uploadedCover]);
+
+    coverImage = coverResponse[0].public_id;
+  }
 
   const event = await Event.findByIdAndUpdate(
     id,
