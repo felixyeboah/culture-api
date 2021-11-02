@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.post("/payment-hook", orderController.createPaymentHook);
 router.get("/:id", orderController.getOrder);
+router.post("/", orderController.createOrder)
 
-router.use(authController.protect);
-router.post("/", orderController.createOrder);
+router.use(authController.protect);;
 router.get("/", orderController.getOrders);
 
 router.use(authController.restrictTo("admin"));

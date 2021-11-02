@@ -5,11 +5,9 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.get("/", eventController.getEvents);
-
+router.get("/:id",eventController.getEvent);
 // Actions can be taken by admin
 router.use(authController.protect);
-router.route("/:id").get(eventController.getEvent);
-
 router.use(authController.restrictTo("admin"));
 router
   .route("/")
