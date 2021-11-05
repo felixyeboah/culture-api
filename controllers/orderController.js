@@ -719,7 +719,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                       >Hi, ${
                                         order?.user !== null
                                           ? order?.user?.firstName
-                                          : order?.firstName
+                                          : order.firstName
                                       } ${
         order?.user ? order?.user?.lastName : order.lastName
       }
