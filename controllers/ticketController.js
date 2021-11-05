@@ -19,12 +19,13 @@ exports.getTicket = catchAsync(async (req, res, next) => {
 });
 
 exports.createTicket = catchAsync(async (req, res, next) => {
-  const { event, name, people, price, options, type } = req.body;
+  const { event, name, people, price, options, type, quantity } = req.body;
 
   if (!event) return next(new AppError("Event is required!", 400));
   if (!name) return next(new AppError("Name is required!", 400));
   if (!price) return next(new AppError("Price is required!", 400));
   if (!type) return next(new AppError("Type is required!", 400));
+  if (!quantity) return next(new AppError("Quantity is required!", 400));
 
   const ticket = await Ticket.create({
     event,
@@ -33,6 +34,7 @@ exports.createTicket = catchAsync(async (req, res, next) => {
     price,
     options,
     type,
+    quantity,
   });
 
   res.status(201).json(ticket);

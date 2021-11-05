@@ -23,7 +23,16 @@ const ticketSchema = new mongoose.Schema(
       default: "table",
     },
     options: [String],
+    quantity: {
+      type: Number,
+      default: 0,
+    },
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
   },
+
   {
     timestamps: true,
   }
