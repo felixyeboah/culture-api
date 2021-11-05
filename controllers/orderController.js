@@ -6,14 +6,27 @@ const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  if (!req.user._id) return next(new AppError("User is required!", 400));
-
+  if (!req.body.email) return next(new AppError("User is required!", 400));
+  // console.log("body", req.body);
+  // console.log("user", req.user);
+  // console.log("email", req.user.email);
+  // console.log("id", req.user._id);
+  // console.log("req email", req.body.email);
   if (!req.body.ticket) return next(new AppError("Ticket is required!", 400));
 
   let order = await Order.create({
-    user: req.user._id,
+    user: req.user ? req.user._id : null,
     ticket: req.body.ticket,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
   });
+
+  if (req.body.email) {
+    order.guest = true;
+  }
+
+  await order.save();
 
   order = await order.populate({
     path: "ticket",
@@ -51,6 +64,10 @@ exports.getOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.createPaymentHook = catchAsync(async (req, res) => {
+  console.log("Status", req.body.Status);
+  console.log("Data", req.body.Data);
+  console.log("req", req);
+  console.log("body", req.body);
   const {
     CheckoutId,
     ClientReference,
@@ -698,7 +715,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                         font-size: 22px;
                                         line-height: 35.2px;
                                       "
-                                      >Hi, ${order.user.firstName} ${order.user.lastName}
+                                      >Hi, ${
+                                        order.user.firstName || order.firstName
+                                      } ${order.user.lastName || order.lastName}
                                     </span>
                                   </p>
                                   <p style="font-size: 14px; line-height: 160%">
@@ -1296,7 +1315,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 `;
 
       await email.sendMail(
-        order.user.email,
+        order.user.email || order.email,
         `${order.ticket.event.name} QR CODE`,
         "Your event pass!",
         html

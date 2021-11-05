@@ -4,7 +4,6 @@ const ordersSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "User",
     },
     ticket: {
@@ -31,6 +30,19 @@ const ordersSchema = new mongoose.Schema(
       default: "pending",
     },
     url: {
+      type: String,
+    },
+    guest: {
+      type: Boolean,
+      default: false,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    email: {
       type: String,
     },
   },
