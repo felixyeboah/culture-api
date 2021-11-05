@@ -26,6 +26,13 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     email: req.body.email,
   });
 
+  const existingEmail = await Order.findOne({
+    email: req.body.email,
+    _id: req.body.id,
+  });
+
+  console.log("existing", existingEmail);
+
   if (req.body.email) {
     order.guest = true;
   }
@@ -1320,7 +1327,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 `;
 
       await email.sendMail(
-        order.user !== null ? order.user.email : order.email,
+        order?.user !== null ? order?.user?.email : order?.email,
         `${order.ticket.event.name} QR CODE`,
         "Your event pass!",
         html
