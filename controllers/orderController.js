@@ -716,8 +716,12 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                         line-height: 35.2px;
                                       "
                                       >Hi, ${
-                                        order.user.firstName || order.firstName
-                                      } ${order.user.lastName || order.lastName}
+                                        order.user !== null
+                                          ? order.user.firstName
+                                          : order.firstName
+                                      } ${
+        order.user ? order.user.lastName : order.lastName
+      }
                                     </span>
                                   </p>
                                   <p style="font-size: 14px; line-height: 160%">
@@ -1315,7 +1319,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 `;
 
       await email.sendMail(
-        order.user.email || order.email,
+        order.user !== null ? order.user.email : order.email,
         `${order.ticket.event.name} QR CODE`,
         "Your event pass!",
         html
