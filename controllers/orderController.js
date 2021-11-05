@@ -26,12 +26,6 @@ exports.createOrder = catchAsync(async (req, res, next) => {
     email: req.body.email,
   });
 
-  const existingEmail = await Order.findOne({
-    email: req.body.email,
-  });
-
-  console.log("existing", existingEmail);
-
   if (req.body.email) {
     order.guest = true;
   }
