@@ -1,21 +1,23 @@
 const catchAsync = require("../utils/catchAsync");
 const Order = require("../models/Order");
+const User = require("../models/User");
 const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  if (!req.body.email) return next(new AppError("User is required!", 400));
-  // console.log("body", req.body);
-  // console.log("user", req.user);
-  // console.log("email", req.user.email);
-  // console.log("id", req.user._id);
-  // console.log("req email", req.body.email);
+  if (!(req.body.id || req.body.email))
+    return next(new AppError("User is required!", 400));
+
   if (!req.body.ticket) return next(new AppError("Ticket is required!", 400));
 
+  const user = await User.findOne({ email: req.body.email });
+
+  if (user) return next(new AppError("User is already exist. Log in!", 400));
+
   let order = await Order.create({
-    user: req.user ? req.user._id : null,
+    user: req.body ? req.body.id : null,
     ticket: req.body.ticket,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -64,10 +66,6 @@ exports.getOrder = catchAsync(async (req, res, next) => {
 });
 
 exports.createPaymentHook = catchAsync(async (req, res) => {
-  console.log("Status", req.body.Status);
-  console.log("Data", req.body.Data);
-  console.log("req", req);
-  console.log("body", req.body);
   const {
     CheckoutId,
     ClientReference,
