@@ -84,6 +84,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
         select: "name",
         populate: { path: "event", select: "name" },
       });
+    console.log("order", order);
     if (order) {
       order.status = "success";
       order.reference = CheckoutId;
@@ -716,11 +717,11 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
                                         line-height: 35.2px;
                                       "
                                       >Hi, ${
-                                        order.user !== null
-                                          ? order.user.firstName
-                                          : order.firstName
+                                        order?.user !== null
+                                          ? order?.user?.firstName
+                                          : order?.firstName
                                       } ${
-        order.user ? order.user.lastName : order.lastName
+        order?.user ? order?.user?.lastName : order.lastName
       }
                                     </span>
                                   </p>
