@@ -27,10 +27,6 @@ const ticketSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    inStock: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   {

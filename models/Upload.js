@@ -16,6 +16,10 @@ const uploadSchema = new mongoose.Schema(
       type: String,
       required: [true, "Cover is required!"],
     },
+    largeCover: {
+      type: String,
+      required: [true, "Large Cover is required!"],
+    },
   },
   {
     timestamps: true,

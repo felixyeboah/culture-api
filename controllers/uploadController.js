@@ -13,10 +13,14 @@ cloudinary.config({
 
 exports.uploadGalleryImages = upload.fields([
   { name: "cover", maxCount: 1 },
+  { name: "largeCover", maxCount: 1 },
   { name: "images", maxCount: 450 },
 ]);
 
-exports.updateGalleryCover = upload.single("cover");
+exports.updateGalleryCover = upload.fields([
+  { name: "cover", maxCount: 1 },
+  { name: "largeCover", maxCount: 1 },
+]);
 
 exports.getImages = async (req, res) => {
   const images = await Upload.find();
@@ -35,21 +39,31 @@ exports.getSingleImage = catchAsync(async (req, res, next) => {
 
 exports.uploads = catchAsync(async (req, res, next) => {
   const { title } = req.body;
-  const { cover, images } = req.files;
+  const { cover, images, largeCover } = req.files;
 
   try {
     if (!title) return next(new AppError("Title is required!", 400));
 
     let pictureFiles = images;
     let newCover = cover[0].path;
+    let newLargeCover = largeCover[0].path;
     //Check if files exist
     if (!newCover) return next(new AppError("No cover picture attached!", 400));
+    if (!newLargeCover)
+      return next(new AppError("No large cover picture attached!", 400));
     if (!pictureFiles) return next(new AppError("No picture attached!", 400));
 
     //upload cover
     let uploadedCover = cloudinary.uploader.upload(newCover, {
       resource_type: "auto",
       folder: `culture-curations/gallery/${title}/cover`,
+      transformation: [{ quality: "auto", fetch_format: "auto" }],
+    });
+
+    //upload large cover
+    let uploadedLargeCover = cloudinary.uploader.upload(newLargeCover, {
+      resource_type: "auto",
+      folder: `culture-curations/gallery/${title}/largeCover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
@@ -64,14 +78,17 @@ exports.uploads = catchAsync(async (req, res, next) => {
     // await all the uploadController upload functions in promise.all, exactly where the magic happens
     let imageResponses = await Promise.all(multiplePicturePromise);
     let coverResponse = await Promise.all([uploadedCover]);
+    let largeCoverResponse = await Promise.all([uploadedLargeCover]);
 
     const publicId = imageResponses.map((file) => file.public_id);
     const coverImage = coverResponse[0].public_id;
+    const largCoverImage = largeCoverResponse[0].public_id;
 
     const uploadResponse = await Upload.create({
       title: title,
       cover: coverImage,
       images: publicId,
+      largeCover: largCoverImage,
     });
 
     res.status(201).json(uploadResponse);
@@ -84,30 +101,66 @@ exports.uploads = catchAsync(async (req, res, next) => {
 
 exports.updateGallery = catchAsync(async (req, res, next) => {
   const { title } = req.body;
-  const { path: cover } = req.file;
 
   //find item by ID
   const item = await Upload.findOne({ id: req.params.id });
 
   if (!item) return next(new AppError("No Item found with this ID!", 400));
 
-  //upload cover
-  let uploadedCover = cloudinary.uploader.upload(cover, {
-    resource_type: "auto",
-    folder: `culture-curations/gallery/${item.slug}/cover`,
-    transformation: [{ quality: "auto", fetch_format: "auto" }],
-  });
+  let uploadedCover;
+
+  if (req.files.cover) {
+    //upload cover
+    uploadedCover = cloudinary.uploader.upload(req.files.cover[0].path, {
+      resource_type: "auto",
+      folder: `culture-curations/gallery/${item.slug}/cover`,
+      transformation: [{ quality: "auto", fetch_format: "auto" }],
+    });
+  }
+
+  let uploadedLargeCover;
+
+  if (req.files.largeCover) {
+    //upload cover
+    uploadedLargeCover = cloudinary.uploader.upload(
+      req.files.largeCover[0].path,
+      {
+        resource_type: "auto",
+        folder: `culture-curations/gallery/${item.slug}/largeCover`,
+        transformation: [{ quality: "auto", fetch_format: "auto" }],
+      }
+    );
+  }
 
   // await all the uploadController upload functions in promise.all, exactly where the magic happens
-  let coverResponse = await Promise.all([uploadedCover]);
+  let coverResponse;
+  let largeCoverResponse;
 
-  const coverImage = coverResponse[0].public_id;
+  if (uploadedCover) {
+    coverResponse = await Promise.all([uploadedCover]);
+  }
+
+  if (uploadedLargeCover) {
+    largeCoverResponse = await Promise.all([uploadedLargeCover]);
+  }
+
+  let coverImage;
+  let largCoverImage;
+
+  if (coverResponse) {
+    coverImage = coverResponse[0].public_id;
+  }
+
+  if (largeCoverResponse) {
+    largCoverImage = largeCoverResponse[0].public_id;
+  }
 
   const updatedCover = await Upload.findByIdAndUpdate(
     req.params.id,
     {
       title: title,
       cover: coverImage,
+      largeCover: largCoverImage,
     },
     { new: true, runValidators: true }
   );

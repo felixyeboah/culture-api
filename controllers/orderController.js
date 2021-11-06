@@ -1,6 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const Order = require("../models/Order");
 const User = require("../models/User");
+const Ticket = require("../models/Ticket");
 const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
@@ -84,13 +85,14 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
         select: "name",
         populate: { path: "event", select: "name" },
       });
-    console.log("order", order);
     if (order) {
       order.status = "success";
       order.reference = CheckoutId;
       order.phoneNumber = CustomerPhoneNumber;
       order.amount = Amount;
       order.invoiceId = SalesInvoiceId;
+
+      await Ticket.findOneAndUpdate(order.ticket, { $inc: { quantity: -1 } });
 
       const base64QRCode = await QRCode.toDataURL(
         `https://www.curatedbyculture.com/validate?orderId=${order._id}`
