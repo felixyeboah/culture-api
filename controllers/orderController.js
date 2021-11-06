@@ -92,7 +92,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.amount = Amount;
       order.invoiceId = SalesInvoiceId;
 
-      await Ticket.findOneAndUpdate(order.ticket, { $inc: { quantity: -1 } });
+      await Ticket.findOneAndUpdate(order.ticket._id, {
+        $inc: { quantity: -1 },
+      });
 
       const base64QRCode = await QRCode.toDataURL(
         `https://www.curatedbyculture.com/validate?orderId=${order._id}`
