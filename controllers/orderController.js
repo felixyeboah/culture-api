@@ -8,7 +8,8 @@ const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  if (!(req.body.id || req.body.email))
+  console.log("req", req.user);
+  if (!(req.body.id || !req.body.email))
     return res.status(400).json({ message: "User is required!" });
 
   if (!req.body.ticket)
