@@ -1,6 +1,6 @@
 const catchAsync = require("../utils/catchAsync");
 const Order = require("../models/Order");
-const User = require("../models/User");
+// const User = require("../models/User");
 const Ticket = require("../models/Ticket");
 const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
