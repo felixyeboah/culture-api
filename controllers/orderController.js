@@ -8,17 +8,16 @@ const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 
 exports.createOrder = catchAsync(async (req, res, next) => {
-  console.log("req", req);
   if (!(req.body.id || !req.body.email))
     return res.status(400).json({ message: "User is required!" });
 
   if (!req.body.ticket)
     return res.status(400).json({ message: "Ticket is required!" });
 
-  const user = await User.findOne({ email: req.body.email });
-
-  if (user)
-    return res.status(400).json({ message: "User is already exist. Log in!" });
+  // const user = await User.findOne({ email: req.body.email });
+  //
+  // if (user)
+  //   return res.status(400).json({ message: "User is already exist. Log in!" });
 
   let order = await Order.create({
     user: req.body ? req.body.id : null,
