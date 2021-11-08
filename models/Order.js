@@ -24,6 +24,10 @@ const ordersSchema = new mongoose.Schema(
     invoiceId: {
       type: String,
     },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
     status: {
       type: String,
       enum: ["pending", "success"],
