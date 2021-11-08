@@ -93,7 +93,12 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.invoiceId = SalesInvoiceId;
 
       console.log("ticket id", order.ticket._id);
-      console.log("ticket", order.ticket);
+      console.log(
+        "ticket",
+        await Ticket.findOneAndUpdate(order.ticket._id, {
+          $inc: { quantity: -1 },
+        })
+      );
 
       await Ticket.findOneAndUpdate(order.ticket._id, {
         $inc: { quantity: -1 },
