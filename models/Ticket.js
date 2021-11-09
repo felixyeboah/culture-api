@@ -11,7 +11,10 @@ const ticketSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required!"],
     },
-    people: Number,
+    people: {
+      type: Number,
+      default: 0,
+    },
     price: {
       type: Number,
       required: [true, "Price is required!"],
