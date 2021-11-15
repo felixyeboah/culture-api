@@ -5,6 +5,7 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.post("/payment-hook", orderController.createPaymentHook);
+router.route("/sales").get(orderController.getSales);
 router.post("/", orderController.createOrder);
 router.get("/:id", orderController.getOrder);
 
@@ -12,7 +13,6 @@ router.use(authController.protect);
 router.get("/", orderController.getOrders);
 
 router.use(authController.restrictTo("admin"));
-router.route("/sales").get(orderController.getSales);
 router.route("/:id").delete(orderController.deleteOrder);
 
 module.exports = router;
