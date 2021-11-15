@@ -42,6 +42,21 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   res.status(201).json(order);
 });
 
+exports.getSales = catchAsync(async (req, res, next) => {
+  const allSales = await Order.aggregate([
+    { $match: { status: "success" } },
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+        list: { $push: "$$ROOT" },
+        sales: { $sum: 1 },
+      },
+    },
+  ]);
+
+  res.status(200).json(allSales);
+});
+
 exports.getOrders = catchAsync(async (req, res) => {
   const orders = await Order.find()
     .populate("user", "firstName lastName email phoneNumber")
