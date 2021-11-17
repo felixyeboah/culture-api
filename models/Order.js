@@ -49,6 +49,7 @@ const ordersSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    PaymentType: String,
   },
   {
     timestamps: true,

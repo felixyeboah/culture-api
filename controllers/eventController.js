@@ -42,23 +42,21 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     lower: true,
   });
 
-  let uploadedCover = cloudinary.uploader.upload(cover, {
+  let uploadedCover = await cloudinary.uploader.upload(cover, {
     resource_type: "auto",
     folder: `culture-curations/events/${slug}`,
     transformation: [{ quality: "auto", fetch_format: "auto" }],
   });
-
-  // await all the uploadController upload functions in promise.all, exactly where the magic happens
-  let coverResponse = await Promise.all([uploadedCover]);
-
-  const coverImage = coverResponse[0].public_id;
 
   const event = await Event.create({
     name: name,
     date: date.split("T")[0],
     location: location,
     time: time,
-    cover: coverImage,
+    cover: {
+      public_id: uploadedCover.public_id,
+      url: uploadedCover.secure_url,
+    },
     status: status,
   });
 
@@ -69,21 +67,15 @@ exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, date, time, location, status } = req.body;
 
-  let coverImage;
+  let uploadedCover;
 
   if (req.file) {
     const { path: cover, originalname } = req.file;
-
-    let uploadedCover = cloudinary.uploader.upload(cover, {
+    uploadedCover = await cloudinary.uploader.upload(cover, {
       resource_type: "auto",
       folder: `culture-curations/events/${originalname}`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
-
-    // await all the uploadController upload functions in promise.all, exactly where the magic happens
-    let coverResponse = await Promise.all([uploadedCover]);
-
-    coverImage = coverResponse[0].public_id;
   }
 
   const event = await Event.findByIdAndUpdate(
@@ -93,7 +85,10 @@ exports.updateEvent = catchAsync(async (req, res) => {
       date: date,
       time: time,
       location: location,
-      cover: coverImage,
+      cover: {
+        public_id: uploadedCover.public_id,
+        url: uploadedCover.secure_url,
+      },
       status: status,
     },
     {

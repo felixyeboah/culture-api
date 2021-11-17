@@ -35,7 +35,12 @@ exports.uploadSlides = catchAsync(async (req, res, next) => {
     // await all the uploadController upload functions in promise.all, exactly where the magic happens
     let imageResponses = await Promise.all(multiplePicturePromise);
 
-    const publicId = imageResponses.map((file) => file.public_id);
+    const publicId = imageResponses.map((file) => {
+      return {
+        public_id: file.public_id,
+        url: file.secure_url,
+      };
+    });
 
     const uploadResponse = await Slides.create({
       images: publicId,
@@ -50,25 +55,16 @@ exports.uploadSlides = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteSlide = catchAsync(async (req, res, next) => {
-  // const images = await Slides.find();
-  //
-  // console.log("req", req.body.public_id);
-  //
-  // const image = images.map((item) =>
-  //   item.images.filter((img) => img === req.body.public_id)
-  // );
-  //
-  // const img = image[0];
-
-  await cloudinary.uploader.destroy(req.body.public_id, {
-    invalidate: true,
-    resource_type: "image",
-  });
-
-  const slide = await Slides.findOneAndDelete({ images: req.body.public_id });
+  const slide = await Slides.findById(req.body.id);
 
   if (!slide) {
     return next(new AppError("No image found with this ID!", 400));
+  }
+
+  // Delete images associated with the room
+  for (let i = 0; i < slide.images.length; i++) {
+    await cloudinary.v2.uploader.destroy(slide.images[i].public_id);
+    await Slides.findOneAndDelete({ images: slide.images[i].public_id });
   }
 
   res.status(204).json({

@@ -7,7 +7,7 @@ const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 
-exports.createOrder = catchAsync(async (req, res, next) => {
+exports.createOrder = catchAsync(async (req, res) => {
   if (!(req.body.id || req.body.email))
     return res.status(400).json({ message: "User is required!" });
 
@@ -42,7 +42,7 @@ exports.createOrder = catchAsync(async (req, res, next) => {
   res.status(201).json(order);
 });
 
-exports.getSales = catchAsync(async (req, res, next) => {
+exports.getSales = catchAsync(async (req, res) => {
   const allSales = await Order.aggregate([
     { $match: { status: "success" } },
     {
@@ -106,6 +106,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       order.phoneNumber = CustomerPhoneNumber;
       order.amount = Amount;
       order.invoiceId = SalesInvoiceId;
+      order.PaymentType = PaymentDetails.PaymentType;
 
       await Ticket.findOneAndUpdate(
         { _id: order.ticket },

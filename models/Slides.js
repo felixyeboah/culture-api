@@ -3,7 +3,18 @@ const mongoose = require("mongoose");
 const slidesSchema = new mongoose.Schema(
   {
     images: {
-      type: [String],
+      type: [
+        {
+          public_id: {
+            type: String,
+            required: true,
+          },
+          url: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
       required: [true, "Image links are required!"],
     },
   },

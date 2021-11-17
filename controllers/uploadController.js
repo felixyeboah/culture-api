@@ -54,14 +54,14 @@ exports.uploads = catchAsync(async (req, res, next) => {
     if (!pictureFiles) return next(new AppError("No picture attached!", 400));
 
     //upload cover
-    let uploadedCover = cloudinary.uploader.upload(newCover, {
+    let uploadedCover = await cloudinary.uploader.upload(newCover, {
       resource_type: "auto",
       folder: `culture-curations/gallery/${title}/cover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
     //upload large cover
-    let uploadedLargeCover = cloudinary.uploader.upload(newLargeCover, {
+    let uploadedLargeCover = await cloudinary.uploader.upload(newLargeCover, {
       resource_type: "auto",
       folder: `culture-curations/gallery/${title}/largeCover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
@@ -75,20 +75,28 @@ exports.uploads = catchAsync(async (req, res, next) => {
         transformation: [{ quality: "auto", fetch_format: "auto" }],
       })
     );
+
     // await all the uploadController upload functions in promise.all, exactly where the magic happens
     let imageResponses = await Promise.all(multiplePicturePromise);
-    let coverResponse = await Promise.all([uploadedCover]);
-    let largeCoverResponse = await Promise.all([uploadedLargeCover]);
 
-    const publicId = imageResponses.map((file) => file.public_id);
-    const coverImage = coverResponse[0].public_id;
-    const largCoverImage = largeCoverResponse[0].public_id;
+    const publicId = imageResponses.map((file) => {
+      return {
+        public_id: file.public_id,
+        url: file.secure_url,
+      };
+    });
 
     const uploadResponse = await Upload.create({
       title: title,
-      cover: coverImage,
+      cover: {
+        public_id: uploadedCover.public_id,
+        url: uploadedCover.secure_url,
+      },
       images: publicId,
-      largeCover: largCoverImage,
+      largeCover: {
+        public_id: uploadedLargeCover.public_id,
+        url: uploadedLargeCover.secure_url,
+      },
     });
 
     res.status(201).json(uploadResponse);
@@ -111,7 +119,7 @@ exports.updateGallery = catchAsync(async (req, res, next) => {
 
   if (req.files.cover) {
     //upload cover
-    uploadedCover = cloudinary.uploader.upload(req.files.cover[0].path, {
+    uploadedCover = await cloudinary.uploader.upload(req.files.cover[0].path, {
       resource_type: "auto",
       folder: `culture-curations/gallery/${item.slug}/cover`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
@@ -122,7 +130,7 @@ exports.updateGallery = catchAsync(async (req, res, next) => {
 
   if (req.files.largeCover) {
     //upload cover
-    uploadedLargeCover = cloudinary.uploader.upload(
+    uploadedLargeCover = await cloudinary.uploader.upload(
       req.files.largeCover[0].path,
       {
         resource_type: "auto",
@@ -132,35 +140,18 @@ exports.updateGallery = catchAsync(async (req, res, next) => {
     );
   }
 
-  // await all the uploadController upload functions in promise.all, exactly where the magic happens
-  let coverResponse;
-  let largeCoverResponse;
-
-  if (uploadedCover) {
-    coverResponse = await Promise.all([uploadedCover]);
-  }
-
-  if (uploadedLargeCover) {
-    largeCoverResponse = await Promise.all([uploadedLargeCover]);
-  }
-
-  let coverImage;
-  let largCoverImage;
-
-  if (coverResponse) {
-    coverImage = coverResponse[0].public_id;
-  }
-
-  if (largeCoverResponse) {
-    largCoverImage = largeCoverResponse[0].public_id;
-  }
-
   const updatedCover = await Upload.findByIdAndUpdate(
     req.params.id,
     {
       title: title,
-      cover: coverImage,
-      largeCover: largCoverImage,
+      cover: {
+        public_id: uploadedCover.public_id,
+        url: uploadedCover.secure_url,
+      },
+      largeCover: {
+        public_id: uploadedLargeCover.public_id,
+        url: uploadedLargeCover.secure_url,
+      },
     },
     { new: true, runValidators: true }
   );

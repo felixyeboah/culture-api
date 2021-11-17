@@ -9,15 +9,44 @@ const uploadSchema = new mongoose.Schema(
     },
     slug: String,
     images: {
-      type: [String],
+      type: [
+        {
+          public_id: {
+            type: String,
+            required: true,
+          },
+          url: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
       required: [true, "Image links are required!"],
     },
     cover: {
-      type: String,
+      type: {
+        public_id: {
+          type: String,
+          required: true,
+        },
+        url: {
+          type: String,
+          required: true,
+        },
+      },
       required: [true, "Cover is required!"],
     },
     largeCover: {
-      type: String,
+      type: {
+        public_id: {
+          type: String,
+          required: true,
+        },
+        url: {
+          type: String,
+          required: true,
+        },
+      },
       required: [true, "Large Cover is required!"],
     },
   },
