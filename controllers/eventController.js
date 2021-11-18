@@ -60,15 +60,20 @@ exports.updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, date, time, location, status } = req.body;
 
-  let uploadedCover;
+  let coverImage;
 
   if (req.file) {
     const { path: cover, originalname } = req.file;
-    uploadedCover = await cloudinary.uploader.upload(cover, {
+    let uploadedCover = await cloudinary.uploader.upload(cover, {
       resource_type: "auto",
       folder: `culture-curations/events/${originalname}`,
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
+
+    coverImage = {
+      public_id: uploadedCover.public_id,
+      url: uploadedCover.secure_url,
+    };
   }
 
   const event = await Event.findByIdAndUpdate(
@@ -78,10 +83,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
       date: date,
       time: time,
       location: location,
-      cover: {
-        public_id: uploadedCover.public_id,
-        url: uploadedCover.secure_url,
-      },
+      cover: coverImage,
       status: status,
     },
     {
