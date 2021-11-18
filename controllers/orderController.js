@@ -7,7 +7,7 @@ const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
-const TicketEmail = require("../email/TicketEmail");
+const ticket = require("../email/TicketEmail");
 
 exports.createOrder = catchAsync(async (req, res) => {
   if (!(req.body.id || req.body.email))
@@ -124,7 +124,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       //Save order
       order.save();
 
-      const html = TicketEmail(order);
+      const html = ticket.TicketEmail(order);
 
       await email.sendMail(
         order.user ? order.user.email : order.email,
@@ -171,7 +171,7 @@ exports.generateQRCode = catchAsync(async (req, res, next) => {
     //Save order
     // order.save();
 
-    // const html = TicketEmail(order);
+    // const html = ticket.TicketEmail(order);
     //
     // await email.sendMail(
     //   order.user ? order.user.email : order.email,
