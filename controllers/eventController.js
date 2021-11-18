@@ -4,18 +4,11 @@ const AppError = require("../utils/appError");
 const cloudinary = require("cloudinary").v2;
 const upload = require("../utils/upload");
 const slugify = require("slugify");
+const factory = require("./handlerFactory");
 
 exports.uploadEventCover = upload.single("cover");
 
-exports.getEvents = catchAsync(async (req, res) => {
-  const sort = {};
-
-  if (req.query.sort && req.query.order) {
-    sort[req.query.sort] = req.query.order === "desc" ? -1 : 1;
-  }
-  const events = await Event.find().sort("-date");
-  res.status(200).json(events);
-});
+exports.getEvents = factory.getAll(Event);
 
 exports.getEvent = catchAsync(async (req, res, next) => {
   const { id } = req.params;
