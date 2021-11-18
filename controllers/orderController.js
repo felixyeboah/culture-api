@@ -7,7 +7,7 @@ const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
-const { TicketEmail } = require("../email/TicketEmail");
+const TicketEmail = require("../email/TicketEmail");
 
 exports.createOrder = catchAsync(async (req, res) => {
   if (!(req.body.id || req.body.email))
