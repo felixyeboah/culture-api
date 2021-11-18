@@ -149,14 +149,10 @@ exports.generateQRCode = catchAsync(async (req, res, next) => {
 
   if (!order) return next(new AppError("Order not found!", 400));
 
-  console.log("order", order);
-
   if (order.status === "success") {
     const base64QRCode = await QRCode.toDataURL(
       `https://www.curatedbyculture.com/validate?orderId=${order._id}`
     );
-
-    console.log("base64QRCode", base64QRCode);
 
     let uploadedCover = await cloudinary.uploader.upload(base64QRCode, {
       resource_type: "auto",
@@ -164,21 +160,19 @@ exports.generateQRCode = catchAsync(async (req, res, next) => {
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
-    console.log("uploadedCover", uploadedCover);
-
-    // order.url = uploadedCover.url;
+    order.url = uploadedCover.url;
 
     //Save order
-    // order.save();
+    order.save();
 
-    // const html = ticket.TicketEmail(order);
-    //
-    // await email.sendMail(
-    //   order.user ? order.user.email : order.email,
-    //   `${order.ticket.event.name} QR CODE`,
-    //   "Your event pass!",
-    //   html
-    // );
+    const html = ticket.TicketEmail(order);
+
+    await email.sendMail(
+      order.user ? order.user.email : order.email,
+      `${order.ticket.event.name} QR CODE`,
+      "Your event pass!",
+      html
+    );
   } else {
     return res.status(400).json({
       message: "Sorry, you have no successful order!",
@@ -201,7 +195,7 @@ exports.sendQRCode = catchAsync(async (req, res, next) => {
 
   if (!order) return next(new AppError("Order not found!", 400));
 
-  const html = TicketEmail(order);
+  const html = ticket.TicketEmail(order);
 
   if (order.status === "success") {
     await email.sendMail(
