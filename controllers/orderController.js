@@ -70,10 +70,6 @@ exports.getSavedCheckoutUrl = catchAsync(async (req, res) => {
       message: "success",
       data: order,
     });
-  } else {
-    res.status(404).json({
-      message: "Error. Cannot find order!",
-    });
   }
 });
 
