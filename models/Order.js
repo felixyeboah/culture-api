@@ -36,6 +36,9 @@ const ordersSchema = new mongoose.Schema(
     url: {
       type: String,
     },
+    checkoutUrl: {
+      type: String,
+    },
     guest: {
       type: Boolean,
       default: false,

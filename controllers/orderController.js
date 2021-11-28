@@ -1,6 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
 const Order = require("../models/Order");
-// const User = require("../models/User");
 const factory = require("./handlerFactory");
 const Ticket = require("../models/Ticket");
 const AppError = require("../utils/appError");
@@ -16,10 +15,14 @@ exports.createOrder = catchAsync(async (req, res) => {
   if (!req.body.ticket)
     return res.status(400).json({ message: "Ticket is required!" });
 
-  // const user = await User.findOne({ email: req.body.email });
-  //
-  // if (user)
-  //   return res.status(400).json({ message: "User is already exist. Log in!" });
+  let existingOrder = await Order.findOne({ email: req.body.email });
+  let existingOrderId = await Order.exists({ _id: existingOrder?._id });
+
+  if (existingOrderId && existingOrder?.status === "pending")
+    return res.status(404).json({
+      message: "Order exists! Please checkout.",
+      data: existingOrder,
+    });
 
   let order = await Order.create({
     user: req.body ? req.body.id : null,
@@ -27,6 +30,7 @@ exports.createOrder = catchAsync(async (req, res) => {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
   });
 
   if (req.body.email) {
@@ -42,6 +46,35 @@ exports.createOrder = catchAsync(async (req, res) => {
   });
 
   res.status(201).json(order);
+});
+
+exports.saveCheckoutUrl = catchAsync(async (req, res) => {
+  let existingOrder = await Order.findById(req.body.id);
+
+  if (existingOrder.status === "pending") {
+    existingOrder.checkoutUrl = req.body.url;
+  } else {
+    existingOrder.checkoutUrl = " ";
+  }
+
+  existingOrder.save();
+
+  res.status(201).json({});
+});
+
+exports.getSavedCheckoutUrl = catchAsync(async (req, res) => {
+  const order = await Order.findOne({ _id: req.body.id });
+
+  if (order?.status === "pending") {
+    res.status(200).json({
+      message: "success",
+      data: order,
+    });
+  } else {
+    res.status(404).json({
+      message: "Error. Cannot find order!",
+    });
+  }
 });
 
 exports.getSales = catchAsync(async (req, res) => {
@@ -139,7 +172,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 });
 
 exports.generateQRCode = catchAsync(async (req, res, next) => {
-  const order = await Order.findOne({ email: req.body.email })
+  const order = await Order.findById(req.body.id)
     .populate("user", "firstName lastName email phoneNumber")
     .populate({
       path: "ticket",
@@ -185,7 +218,7 @@ exports.generateQRCode = catchAsync(async (req, res, next) => {
 });
 
 exports.sendQRCode = catchAsync(async (req, res, next) => {
-  const order = await Order.findOne({ email: req.body.email })
+  const order = await Order.findById(req.body.id)
     .populate("user", "firstName lastName email phoneNumber")
     .populate({
       path: "ticket",
@@ -221,4 +254,13 @@ exports.deleteOrder = catchAsync(async (req, res, next) => {
   if (!order) return next(new AppError("No order found!", 400));
 
   res.status(204).json({});
+});
+
+exports.deleteUnsucessfulOrders = catchAsync(async (req, res, next) => {
+  const orders = await Order.find({ status: "pending" });
+  if (!orders) return next(new AppError("No pending orders available!", 404));
+  for (let i = 0; i < orders.length; i++) {
+    await Order.findByIdAndDelete(orders[i]._id);
+  }
+  res.status(200).json({});
 });

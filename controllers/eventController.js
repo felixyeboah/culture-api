@@ -76,6 +76,10 @@ exports.updateEvent = catchAsync(async (req, res) => {
     };
   }
 
+  const slug = slugify(name, {
+    lower: true,
+  });
+
   const event = await Event.findByIdAndUpdate(
     id,
     {
@@ -84,6 +88,7 @@ exports.updateEvent = catchAsync(async (req, res) => {
       time: time,
       location: location,
       cover: coverImage,
+      slug,
       status: status,
     },
     {

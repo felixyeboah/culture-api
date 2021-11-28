@@ -3,6 +3,7 @@ const Upload = require("../models/Upload");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const upload = require("../utils/upload");
+const factory = require("./handlerFactory");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -22,10 +23,7 @@ exports.updateGalleryCover = upload.fields([
   { name: "largeCover", maxCount: 1 },
 ]);
 
-exports.getImages = async (req, res) => {
-  const images = await Upload.find();
-  res.status(200).json(images);
-};
+exports.getImages = factory.getAll(Upload);
 
 exports.getSingleImage = catchAsync(async (req, res, next) => {
   const { slug } = req.params;
@@ -68,23 +66,20 @@ exports.uploads = catchAsync(async (req, res, next) => {
     });
 
     //map through images and create a promise array using uploadController upload function
-    let multiplePicturePromise = pictureFiles.map((picture) =>
-      cloudinary.uploader.upload(picture.path, {
+    let imagesLinks = [];
+
+    for (let i = 0; i < pictureFiles.length; i++) {
+      const result = await cloudinary.uploader.upload(pictureFiles[i].path, {
         resource_type: "auto",
         folder: `culture-curations/gallery/${title}`,
         transformation: [{ quality: "auto", fetch_format: "auto" }],
-      })
-    );
+      });
 
-    // await all the uploadController upload functions in promise.all, exactly where the magic happens
-    let imageResponses = await Promise.all(multiplePicturePromise);
-
-    const publicId = imageResponses.map((file) => {
-      return {
-        public_id: file.public_id,
-        url: file.secure_url,
-      };
-    });
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
 
     const uploadResponse = await Upload.create({
       title: title,
@@ -92,7 +87,7 @@ exports.uploads = catchAsync(async (req, res, next) => {
         public_id: uploadedCover.public_id,
         url: uploadedCover.secure_url,
       },
-      images: publicId,
+      images: imagesLinks,
       largeCover: {
         public_id: uploadedLargeCover.public_id,
         url: uploadedLargeCover.secure_url,
