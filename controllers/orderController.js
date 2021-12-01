@@ -149,6 +149,7 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
       let coverResponse = await Promise.all([uploadedCover]);
 
       order.url = coverResponse[0].url;
+      order.checkoutUrl = "";
 
       //Save order
       order.save();
