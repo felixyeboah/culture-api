@@ -88,7 +88,14 @@ exports.getSales = catchAsync(async (req, res) => {
   res.status(200).json(allSales);
 });
 
-exports.getOrders = factory.getAll(Order);
+exports.getOrders = factory
+  .getAll(Order)
+  .populate("user", "firstName lastName email phoneNumber")
+  .populate({
+    path: "ticket",
+    select: "name price",
+    populate: { path: "event", select: "name date" },
+  });
 
 exports.getOrder = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.params.id)
