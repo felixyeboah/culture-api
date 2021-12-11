@@ -52,6 +52,10 @@ const ordersSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    checked: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

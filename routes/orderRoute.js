@@ -12,7 +12,10 @@ router.route("/:id").get(orderController.getOrder);
 
 router.use(authController.protect);
 router.use(authController.restrictTo("admin", "checker"));
-router.get("/", orderController.getOrders);
+router
+  .route("/")
+  .get(orderController.getOrders)
+  .patch(orderController.updateOrder);
 router.route("/sales").get(orderController.getSales);
 router.route("/send-email").post(orderController.sendQRCode);
 router.route("/generate-ticket").post(orderController.generateQRCode);

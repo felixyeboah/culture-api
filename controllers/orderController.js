@@ -168,6 +168,15 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
   res.status(200).json({});
 });
 
+exports.updateOrder = catchAsync(async (req, res) => {
+  const { id, check } = req.body;
+  const order = await Order.findByIdAndUpdate(id, {
+    check,
+  });
+
+  res.status(200).json(order);
+});
+
 exports.generateQRCode = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.body.id)
     .populate("user", "firstName lastName email phoneNumber")
