@@ -6,6 +6,7 @@ const QRCode = require("qrcode");
 const email = require("../utils/sendMail");
 const { v2: cloudinary } = require("cloudinary");
 const ticket = require("../email/TicketEmail");
+const APIFeatures = require("./../utils/apiFeatures");
 
 exports.createOrder = catchAsync(async (req, res) => {
   if (!(req.body.id || req.body.email))
@@ -87,18 +88,29 @@ exports.getSales = catchAsync(async (req, res) => {
   res.status(200).json(allSales);
 });
 
-exports.getOrders = catchAsync(async (req, res, next) => {
-  const order = await Order.find()
-    .populate("user", "firstName lastName email phoneNumber")
-    .populate({
-      path: "ticket",
-      select: "name price",
-      populate: { path: "event", select: "name date" },
-    });
+exports.getOrders = catchAsync(async (req, res) => {
+  let filter = {};
 
-  if (!order) return next(new AppError("Order not found!", 400));
+  if (req.params.slug) filter = { slug: req.params.slug };
 
-  res.status(200).json(order);
+  const order = await new APIFeatures(
+    Order.find()
+      .populate("user", "firstName lastName email phoneNumber")
+      .populate({
+        path: "ticket",
+        select: "name price",
+        populate: { path: "event", select: "name date" },
+      }),
+    req.query
+  );
+
+  const doc = await order.query;
+
+  res.status(200).json({
+    status: "success",
+    results: doc.length,
+    data: doc,
+  });
 });
 
 exports.getOrder = catchAsync(async (req, res, next) => {
