@@ -196,9 +196,9 @@ exports.createPaymentHook = catchAsync(async (req, res) => {
 });
 
 exports.updateOrder = catchAsync(async (req, res) => {
-  const { id, check } = req.body;
+  const { id, checked } = req.body;
   const order = await Order.findByIdAndUpdate(id, {
-    check,
+    checked,
   });
 
   res.status(200).json(order);
