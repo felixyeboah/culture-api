@@ -65,22 +65,13 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getAll = (Model, name, select, name2, select2, path, select3) =>
+exports.getAll = (Model) =>
   catchAsync(async (req, res) => {
     // To allow for nested GET reviews on tour (hack)
     let filter = {};
     if (req.params.slug) filter = { slug: req.params.slug };
 
-    const features = new APIFeatures(
-      Model.find(filter)
-        .populate(name, select)
-        .populate({
-          name: name2,
-          select: select2,
-          populate: { path: path, select: select3 },
-        }),
-      req.query
-    )
+    const features = new APIFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
       .limitFields()

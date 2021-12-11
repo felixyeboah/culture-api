@@ -1,6 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
 const Order = require("../models/Order");
-const factory = require("./handlerFactory");
 const Ticket = require("../models/Ticket");
 const AppError = require("../utils/appError");
 const QRCode = require("qrcode");
@@ -88,15 +87,19 @@ exports.getSales = catchAsync(async (req, res) => {
   res.status(200).json(allSales);
 });
 
-exports.getOrders = factory.getAll(
-  Order,
-  "user",
-  "firstName lastName email phoneNumber",
-  "ticket",
-  "name price",
-  "event",
-  "name date"
-);
+exports.getOrders = catchAsync(async (req, res, next) => {
+  const order = await Order.find()
+    .populate("user", "firstName lastName email phoneNumber")
+    .populate({
+      path: "ticket",
+      select: "name price",
+      populate: { path: "event", select: "name date" },
+    });
+
+  if (!order) return next(new AppError("Order not found!", 400));
+
+  res.status(200).json(order);
+});
 
 exports.getOrder = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.params.id)
