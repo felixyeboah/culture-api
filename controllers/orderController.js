@@ -102,7 +102,11 @@ exports.getOrders = catchAsync(async (req, res) => {
         populate: { path: "event", select: "name date" },
       }),
     req.query
-  );
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
   const doc = await order.query;
 
