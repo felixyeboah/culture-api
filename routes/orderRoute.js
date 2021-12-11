@@ -16,6 +16,8 @@ router
   .route("/")
   .get(orderController.getOrders)
   .patch(orderController.updateOrder);
+
+router.use(authController.restrictTo("admin"));
 router.route("/sales").get(orderController.getSales);
 router.route("/send-email").post(orderController.sendQRCode);
 router.route("/generate-ticket").post(orderController.generateQRCode);
