@@ -56,6 +56,10 @@ const ordersSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    scanned: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
