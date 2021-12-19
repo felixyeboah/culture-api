@@ -129,7 +129,9 @@ exports.getOrder = catchAsync(async (req, res, next) => {
   if (!order) return next(new AppError("Order not found!", 400));
 
   if (order.scanned)
-    return next(new AppError("Order has been scanned already!", 400));
+    res.status(400).json({
+      message: "Ticket has been scanned already!",
+    });
 
   order.scanned = true;
 
