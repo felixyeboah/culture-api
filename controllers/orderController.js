@@ -128,15 +128,14 @@ exports.getOrder = catchAsync(async (req, res, next) => {
 
   if (!order) return next(new AppError("Order not found!", 400));
 
-  if (order.scanned) {
+  if (order.scanned)
     return next(new AppError("Order has been scanned already!", 400));
-  } else {
-    order.scanned = true;
 
-    await order.save();
+  order.scanned = true;
 
-    res.status(200).json(order);
-  }
+  await order.save();
+
+  res.status(200).json(order);
 });
 
 exports.createPaymentHook = catchAsync(async (req, res) => {
